@@ -35,14 +35,17 @@
 </template>
 
 <script setup>
-import { ref, toRefs, defineProps, computed } from 'vue';
+import { ref, toRefs, defineProps, defineEmits, computed } from 'vue';
+
 const props = defineProps({
     amounts: {
         type: Array,
         default: () => [],
     }
 });
+
 const { amounts } = toRefs(props);
+
 const amountToPixels = (amount) => {
     const min = Math.min(...amounts.value);
     const max = Math.max(...amounts.value);
@@ -50,9 +53,11 @@ const amountToPixels = (amount) => {
     const minmax = Math.abs(max) + Math.abs(min);
     return 200 - ((amountAbs * 100) / minmax) * 2;
 }
+
 const zero = computed(() => {
     return amountToPixels(0);
 });
+
 const points = computed(() => {
     const total = amounts.value.length;
     return amounts.value.reduce((points, amount, i) => {
@@ -61,18 +66,26 @@ const points = computed(() => {
         return `${points} ${x},${y}`;
     }, "0, 100");
 });
+
 const showPointer = ref(false);
+
 const pointer = ref(0);
+
+// const emit = defineEmits(["select"]);
+
 const tap = ({ target, touches }) => {
     showPointer.value = true;
     const elementWidth = target.getBoundingClientRect().width;
     const elementX = target.getBoundingClientRect().x;
     const touchX = touches[0].clientX;
     pointer.value = ((touchX - elementX) * 300) / elementWidth;
+    // emit("select", )
 }
+
 const untap = () => {
     showPointer.value = false;
 }
+
 </script>
 
 <style scoped>
