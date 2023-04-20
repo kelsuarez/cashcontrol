@@ -14,13 +14,14 @@
                     <Graphic :amounts="amounts"/>
                 </template>
                 <template #action>
-                    <Action/>
+                    <Action @create="create"/>
                 </template>
             </Resume>
         </template>
         <template #movements>
             <Movements
                 :movements="movements"
+                @remove="remove"
             />
         </template>
     </Layout>
@@ -34,6 +35,7 @@ import Action from './Action.vue';
 import Movements from './Movements/Index.vue';
 import Graphic from './Resume/Graphic.vue';
 import { computed } from '@vue/reactivity';
+import { remove } from '@vue/shared';
 
 export default {
     components: {
@@ -124,7 +126,7 @@ export default {
                 .map(m => m.amount);
 
             return lasDays.map((m, i) => {
-                
+
                 const lastMovements = lasDays.slice(0, i);
 
                 return lastMovements.reduce((suma, movement) => {
@@ -133,6 +135,15 @@ export default {
 
                 }, 0);
             });
+        }
+    },
+    methods: {
+        create(movement) {
+            this.movements.push(movement);
+        },
+        remove(id) {
+            const index = this.movements.findIndex(m => m.id === id);
+            this.movements.splice(index, 1);
         }
     }
 };
