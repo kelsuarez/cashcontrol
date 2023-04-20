@@ -7,9 +7,9 @@
                 stroke="#c4c4c4"
                 stroke-width="2"
                 x1="0"
-                y1="100"
+                :y1="zero"
                 x2="300"
-                y2="100"
+                :y2="zero"
             />
             <line
                 stroke="#04b500"
@@ -23,12 +23,53 @@
                 fill="none"
                 stroke="#0689B0"
                 stroke-width="2"
-                points="0,0 100,100 200,100 300,200"
+                :points="points"
             />
         </svg>
         <p>Dernières 30 jours</p>
+        <div>{{ zero }}</div>
     </div>
 </template>
+
+<script setup>
+
+import { defineProps, toRefs, computed } from 'vue';
+
+const props = defineProps({
+    amounts: {
+        type: Array,
+        default: () => [],
+    }
+});
+
+const { amounts } = toRefs(props);
+
+const amountToPixels = (amount) => {
+    const min = Math.min(...amounts.value);
+    const max = Math.max(...amounts.value);
+
+    const amountAbs = amount + Math.abs(min);
+    const minmax = Math.abs(max) + Math.abs(min);
+
+    return 200 - ((amountAbs * 100) / minmax) * 2;
+}
+
+const zero = computed (() => {
+    return amountToPixels(0);
+});
+
+const points = computed (() => {
+    const total = amounts.value.length;
+     
+    return amounts.value.reduce((points, amount, i) => {
+        const x = (300 / total) * (i + 1);
+        const y = amountToPixels(amount);
+        console.log(y)
+        return `${points} ${x}, ${y}`;
+    }, "0,100");
+});
+
+</script>
 
 <style scoped>
 svg {
